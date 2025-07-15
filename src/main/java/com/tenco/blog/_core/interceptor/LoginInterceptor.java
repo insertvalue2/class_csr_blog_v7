@@ -26,6 +26,8 @@ public class LoginInterceptor implements HandlerInterceptor {
            throw new Exception401("로그인 먼저 해주세요");
            //return false;
        }
+
+
        return true;
     }
 
