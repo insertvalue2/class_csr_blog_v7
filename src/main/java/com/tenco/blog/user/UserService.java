@@ -3,6 +3,7 @@ package com.tenco.blog.user;
 import com.tenco.blog._core.errors.exception.Exception400;
 import com.tenco.blog._core.errors.exception.Exception403;
 import com.tenco.blog._core.errors.exception.Exception404;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;

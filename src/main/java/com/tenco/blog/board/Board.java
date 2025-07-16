@@ -18,7 +18,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-// 기본 생성자 - JPA에서 엔티티는 기본 생성자가 필요
 @Data
 @Table(name = "board_tb")
 @Entity
@@ -29,11 +28,7 @@ public class Board {
 
     private String title;
     private String content;
-    // V2에서 사용했던 방식
-    // private String username;
-    // V3 에서 Board 엔티티는 User 엔티티와 연관관계가 성립이 된다
 
-    // 다대일
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id") // 외래키 컬러명 명시
     private User user;
@@ -41,12 +36,9 @@ public class Board {
     @CreationTimestamp
     private Timestamp createdAt;
 
-    // 테이블에 필드 만들지 마 !
-    // (현재 로그인한 유저와 게시글 작성자 여부를 판단 함)
     @Transient
     private boolean isBoardOwner;
 
-    // 게시글에 소유자를 직접 확인하는 기능을 만들자
     public boolean isOwner(Long checkUserId) {
         return this.user.getId().equals(checkUserId);
     }
@@ -75,15 +67,9 @@ public class Board {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "board", cascade = CascadeType.REMOVE)
     List<Reply> replies = new ArrayList<>(); // List 선언과 동시에 초기화
 
-    // 수정 기능 추가
     public void update(BoardRequest.UpdateDTO updateDTO) {
-        // 사용자가 던진 값이 유효한지 확인 절차
-        updateDTO.validate();
         this.title = updateDTO.getTitle();
         this.content = updateDTO.getContent();
-        // 필드 값 변경 감지 해서 더티 체킹
-        // 트랜잭션이 끝나는 시점에 자동으로 Update 쿼리를 생성해서
-        // 물리적인 저장 장치인 DB 에 commit (반영 함)
     }
 
 }

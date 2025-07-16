@@ -4,10 +4,12 @@ import com.tenco.blog._core.common.ApiUtil;
 import com.tenco.blog.user.User;
 import com.tenco.blog.utils.Define;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +22,6 @@ public class BoardRestController {
 
     private final BoardService boardService;
 
-    // http://localhost:8080/?page=0&size=10
-    // http://localhost:8080/
     @GetMapping("/")
     public ResponseEntity<ApiUtil<List<BoardResponse.MainDTO>>> main(
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -32,8 +32,6 @@ public class BoardRestController {
         return ResponseEntity.ok(new ApiUtil<>(boardList));
     }
 
-    // 게시글 상세 보기 API 설계
-    // GET http://localhost:8080/api/board/{id} Http 1.1
     @GetMapping("/api/boards/{id}/detail")
     public ResponseEntity<ApiUtil<BoardResponse.DetailDTO>> detail(
             @PathVariable(name = "id") Long id, HttpSession session) {
@@ -46,12 +44,12 @@ public class BoardRestController {
 
     // 게시글 작성 API
     @PostMapping("/api/boards")
-    public ResponseEntity<?> save(@RequestBody BoardRequest.SaveDTO saveDTO,
+    public ResponseEntity<?> save(
+            @Valid @RequestBody BoardRequest.SaveDTO saveDTO,
+                                  Errors errors,
                                   HttpSession session) {
         log.info("게시글 작성 요청 API - title : {}", saveDTO.getTitle());
-        saveDTO.validate();
         User sessionUser = (User) session.getAttribute(Define.SESSION_USER);
-
         BoardResponse.SaveDTO savedBoard = boardService.save(saveDTO, sessionUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiUtil<>(savedBoard));
     }
@@ -59,12 +57,10 @@ public class BoardRestController {
     // 게시글 수정 API
     @PutMapping("/api/boards/{id}")
     public ResponseEntity<?> update(@PathVariable(name = "id") Long id,
-                                    @RequestBody BoardRequest.UpdateDTO updateDTO,
+                                    @Valid @RequestBody BoardRequest.UpdateDTO updateDTO,
+                                    Errors errors,
                                     HttpSession session) {
         log.info("게시글 수정 API 호출 - ID : {}", id);
-        // 인증 검사 먼저
-        // 유효성 검사
-        updateDTO.validate();
         User sessionUser = (User) session.getAttribute(Define.SESSION_USER);
         BoardResponse.UpdateDTO updateBoard = boardService.update(id, updateDTO, sessionUser);
         return ResponseEntity.ok(new ApiUtil<>(updateBoard));
@@ -79,7 +75,6 @@ public class BoardRestController {
         boardService.deleteById(id, sessionUser);
         return ResponseEntity.ok(new ApiUtil<>("게시글 삭제 성공"));
     }
-
 }
 
 
