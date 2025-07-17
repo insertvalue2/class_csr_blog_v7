@@ -3,9 +3,11 @@ package com.tenco.blog.user;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface UserJpaRepository extends JpaRepository<User, Long> {
 
     // 사용자명과 비밀번호로 사용자 조회 (로그인용)
@@ -14,8 +16,6 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
                                              @Param("password") String password);
 
     // 사용자 이름으로 사용자 조회(중복 체크용)
-    // @Query(value = "select * from user_tb where username = :username", nativeQuery = true)
-    // JPQL 명식적으로 입력해서 사용함
     @Query("SELECT u FROM User u WHERE u.username = :username")
     Optional<User> findByUsername(@Param("username") String username);
 
