@@ -72,6 +72,10 @@ public class Board {
         this.content = updateDTO.getContent();
     }
 
+    public String getWriterName() {
+        return this.getUser().getUsername();
+    }
+
 }
 
 
